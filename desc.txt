@@ -1,0 +1,202 @@
+Absolutely, Elliott—here's your full and final Cursor AI–ready spec, combining idle scanning, Discord alerts, the complete GUI with a Debug tab, and an airtight explanation for Cursor to build it end-to-end—even without prior Roblox knowledge.
+
+💼 Project Title: Roblox Trade Command Engine
+Owner: Elliott
+Goal: Build an autonomous trading assistant for Roblox Limiteds that continuously scans market data via Rolimons, identifies the most profitable trade opportunities, and sends alerts to Discord with a GUI that includes real-time analytics and debug testing.
+
+🧠 Overview
+project_type: Roblox Trading Bot  
+target_platforms: Rolimons API + Roblox Limiteds  
+audience: Roblox traders & analysts  
+description: >
+  A system that runs continuously, analyzes tradeable Limited items from Rolimons,
+  scores them using dynamic weights and strategy modes (e.g. Sniper, Aggressive),
+  simulates trade combos, tracks historical metrics, and alerts Elliott via Discord
+  when a trade exceeds a configured profit threshold. Includes a GUI for monitoring,
+  timeline visualization, forecast calendar, and a debug tab for endpoint testing.
+
+
+
+🎮 Roblox Concepts for Cursor (No Assumed Knowledge)
+| Term | Definition | 
+| Limiteds | Rare Roblox items with resell and trade functionality | 
+| RAP | Recent Average Price (standard market metric) | 
+| Demand Tier | A community-assigned rating of an item’s desirability | 
+| Volume | Quantity of trades in recent time window | 
+| Trade Combo | Multiple items offered in exchange for others | 
+| Engagement Score | Metric derived from Discord/Twitter mentions and sentiment | 
+| Strategy Modes | System presets: Sniper (undervalued), Aggressive (momentum), etc. | 
+
+
+
+📁 Backend File Layout
+backend/
+├── main.py
+├── api/
+│   └── routes.py
+├── scraper/
+│   └── rolimons_scraper.py
+├── scoring/
+│   ├── score_engine.py
+│   └── strategy_modes.py
+├── trade/
+│   ├── trade_simulator.py
+│   ├── combo_optimizer.py
+│   └── risk_index.py
+├── modules/
+│   ├── momentum_detector.py
+│   ├── underpricing_finder.py
+│   ├── calendar_forecaster.py
+│   └── trait_analyzer.py
+├── social/
+│   └── engagement_miner.py
+├── config/
+│   └── config_manager.py
+├── storage/
+│   ├── gzip_cache.py
+│   └── metadata_indexer.py
+├── ai/
+│   └── forecast_model.py (stub)
+
+
+
+🔌 FastAPI Endpoints
+| Method | Endpoint | Description | 
+| GET | /scan | Run a Rolimons item scan | 
+| GET | /top-picks | Return top scored items | 
+| GET | /combo | Return best trade combinations | 
+| GET | /timeline/{item} | Item’s historical data (RAP/demand/volume) | 
+| POST | /config | Update weights, strategy mode | 
+| POST | /webhook | Save Discord webhook/role ID | 
+| GET | /calendar | Show forecasted trade windows | 
+| GET | /risk-index | Return current market volatility | 
+| GET | /status | Uptime, last scan, current mode | 
+
+
+
+⚙️ Idle Scanning Logic (main.py or trade_simulator.py)
+# cursor.generate: Run scanner loop, send Discord alerts on high-quality trade detection
+
+SCAN_INTERVAL = 60  # seconds
+GAIN_THRESHOLD = 3500
+CONFIDENCE_THRESHOLD = 0.9
+
+def idle_scan_loop():
+    while True:
+        items = fetch_data()
+        scored = score_items(items)
+        combos = generate_trade_combos(scored)
+        for combo in combos:
+            if combo['projected_gain'] > GAIN_THRESHOLD and combo['confidence'] > CONFIDENCE_THRESHOLD:
+                send_to_discord(combo)
+        sleep(SCAN_INTERVAL)
+
+
+
+🔔 Discord Alert Format (/webhook)
+{
+  "combo": "Valkyrie Helm + Beast Mode → Dominus",
+  "gain": 4200,
+  "confidence": 0.91,
+  "forecast": "rising",
+  "link": "https://www.rolimons.com/item/123456"
+}
+
+
+Send formatted embed via webhook only if trade passes config threshold.
+
+📊 Scoring Engine (score_engine.py)
+Config JSON:
+{
+  "roi_weight": 0.3,
+  "demand_weight": 0.2,
+  "volume_weight": 0.15,
+  "volatility_weight": 0.1,
+  "engagement_weight": 0.15,
+  "trait_weight": 0.1,
+  "strategy_mode": "sniper"
+}
+
+
+Formula:
+def calculate_score(item, weights):
+    return (
+        item.roi * weights['roi_weight'] +
+        item.demand * weights['demand_weight'] +
+        item.volume * weights['volume_weight'] +
+        item.volatility * weights['volatility_weight'] +
+        item.engagement * weights['engagement_weight'] +
+        item.trait_score * weights['trait_weight']
+    )
+
+
+
+🖥️ GUI Tabs
+| Tab | Function | 
+| Dashboard | Top picks, forecast, combo alerts | 
+| Trade Console | Item swaps, simulated gain, risk level | 
+| Timeline Viewer | RAP/demand/volume graphs | 
+| Strategy Config | Sliders for scoring weights + mode selector | 
+| Calendar | Shows predicted trade windows (from calendar_forecaster.py) | 
+| Alert Log | Discord messages sent + trigger conditions | 
+| Debug Tab ✅ | Manual runner for all endpoints & modules | 
+
+
+
+👨‍🔧 GUI Debug Tab (gui_debug.py)
+class DebugTab:
+    def __init__(self):
+        self.endpoints = [
+            "/scan",
+            "/top-picks",
+            "/combo",
+            "/timeline/item",
+            "/config",
+            "/risk-index",
+            "/calendar",
+            "/status"
+        ]
+    def run_tests(self):
+        results = {}
+        for endpoint in self.endpoints:
+            results[endpoint] = test_call(endpoint)
+        return results
+
+
+Each test shows:
+- Request method
+- Response status
+- Data payload
+- Runtime performance
+
+📦 GZIP Caching
+Stored as:
+- /cache/{item_id}/YYYY-MM-DD.json.gz
+- Indexed via /metadata/latest.json
+- Deduplicated when RAP change < 2%
+- Uses Azure Blob tiering (Hot/Cold)
+
+🧠 Forecast Model (forecast_model.py)
+# cursor.skip: ML model stub for future implementation
+
+def predict_trade_success(item_features):
+    return {
+        "projected_gain": 4100,
+        "confidence": 0.91
+    }
+
+
+
+🚀 Behavior Summary
+- Scans Rolimons API continuously
+- Scores items via strategy mode + weights
+- Simulates trades → filters by gain/confidence
+- Alerts Elliott via Discord for top-tier opportunities
+- Stores trends in compressed logs
+- GUI shows full dashboard, forecast calendar, alerts, timeline
+- Debug tab tests entire system at runtime
+
+You can copy this directly into Cursor and say:
+“Build this entire project in Python using FastAPI for backend and basic GUI (Tkinter or React). Create all modules. Start with scraper, scoring, idle scan loop, and debug tab.”
+
+Want help structuring the webhook embed design or trade visualization next? Just say the word—your empire is nearly fully operational 💼📈🧠
